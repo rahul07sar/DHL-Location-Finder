@@ -1,0 +1,6 @@
+dhl_location_finder.menu_item:
+  title: 'Location Finder'
+  description: 'Find locations using DHL'
+  route_name: dhl_location_finder.form
+  menu_name: main
+  weight: 10

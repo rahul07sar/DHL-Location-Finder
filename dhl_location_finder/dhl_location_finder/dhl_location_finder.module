@@ -1,0 +1,95 @@
+<?php
+
+use Drupal\Core\Routing\RouteBuilderInterface;
+use Drupal\Core\Routing\RouteMatchInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+use Drupal\Core\DependencyInjection\ContainerBuilder;
+use Drupal\Core\DependencyInjection\ServiceProviderInterface;
+use Drupal\Core\Menu\MenuLinkManagerInterface;
+use Drupal\Core\Menu\MenuLinkInterface;
+
+class DHLLocationFinderModule implements ServiceProviderInterface {
+
+  public function register(ContainerBuilder $container) {
+    $container->register('dhl_location_finder.route_builder', 'Drupal\dhl_location_finder\RouteBuilder')
+      ->addArgument(new Reference('service_container'));
+  }
+
+}
+class DHLLocationFinder implements RouteBuilderInterface {
+  /**
+   * The container.
+   *
+   * @var \Symfony\Component\DependencyInjection\ContainerInterface
+   */
+  protected $container;
+
+  /**
+   * Constructs a new DHLLocationFinder.
+   *
+   * @param \Symfony\Component\DependencyInjection\ContainerInterface $container
+   *   The container.
+   */
+  public function __construct(ContainerInterface $container) {
+    $this->container = $container;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getRouteName() {
+    return 'dhl_location_finder.form';
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getRouteParameters() {
+    return [];
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getRouteObject() {
+    $route = new Route('dhl_location_finder.form');
+    return $route;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function buildRoutes() {
+    $route = new Route('dhl_location_finder.custom');
+    $route->setPath('/custom-path');
+    $route->setDefaults(['_controller' => 'Drupal\dhl_location_finder\Controller\CustomController::customMethod']);
+    return [$route];
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function rebuild() {
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function rebuildIfNeeded() {
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setRebuildNeeded() {
+  }
+}
+
+function dhl_location_finder_theme($existing, $type, $theme, $path) {
+    return [
+      'location_finder' => [
+        'variables' => ['output' => NULL],
+        'template' => 'location-finder',
+      ],
+    ];
+  }

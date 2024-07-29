@@ -1,5 +1,4 @@
 <?php
-
 use Drupal\Core\Routing\RouteBuilderInterface;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -38,6 +37,7 @@ class DHLLocationFinder implements RouteBuilderInterface {
    * {@inheritdoc}
    */
   public function getRouteName() {
+    // Return the name of the route. You can get this from the route definition.
     return 'dhl_location_finder.form';
   }
 
@@ -45,6 +45,7 @@ class DHLLocationFinder implements RouteBuilderInterface {
    * {@inheritdoc}
    */
   public function getRouteParameters() {
+    // Return an array of route parameters. You can get these from the route definition.
     return [];
   }
 
@@ -52,7 +53,9 @@ class DHLLocationFinder implements RouteBuilderInterface {
    * {@inheritdoc}
    */
   public function getRouteObject() {
+    // Return the route object. You can get this from the route definition.
     $route = new Route('dhl_location_finder.form');
+    // You can also add route requirements, options, etc. here.
     return $route;
   }
 
@@ -60,6 +63,8 @@ class DHLLocationFinder implements RouteBuilderInterface {
    * {@inheritdoc}
    */
   public function buildRoutes() {
+    // This method is called to build the routes. You can add your custom route building logic here.
+    // For example, you can add a new route:
     $route = new Route('dhl_location_finder.custom');
     $route->setPath('/custom-path');
     $route->setDefaults(['_controller' => 'Drupal\dhl_location_finder\Controller\CustomController::customMethod']);
@@ -70,18 +75,24 @@ class DHLLocationFinder implements RouteBuilderInterface {
    * {@inheritdoc}
    */
   public function rebuild() {
+    // Rebuild the routes.
+    // You can add your custom route rebuilding logic here.
   }
 
   /**
    * {@inheritdoc}
    */
   public function rebuildIfNeeded() {
+    // Rebuild the routes if needed.
+    // You can add your custom route rebuilding logic here.
   }
 
   /**
    * {@inheritdoc}
    */
   public function setRebuildNeeded() {
+    // Set the rebuild needed flag.
+    // You can add your custom logic here.
   }
 }
 

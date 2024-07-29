@@ -1,0 +1,24 @@
+<h1>Location Finder</h1>
+
+{% if output|trim == 'No locations found. Please check your country and city name.' %}
+    <p>{{ output }}</p>
+{% else %}
+    {% for location in output|split('---') %}
+        {% if location|trim!= '' %}
+            <h2>{{ location|trim|split(':')[1]|trim }}</h2>
+            <p>Address:</p>
+            <ul>
+                <li>Country Code: {{ location|trim|split('\n')[2]|split(':')[1]|trim }}</li>
+                <li>Postal Code: {{ location|trim|split('\n')[3]|split(':')[1]|trim }}</li>
+                <li>Address Locality: {{ location|trim|split('\n')[4]|split(':')[1]|trim }}</li>
+                <li>Street Address: {{ location|trim|split('\n')[5]|split(':')[1]|trim }}</li>
+            </ul>
+            <p>Opening Hours:</p>
+            <ul>
+            {% for hour in location|trim|split('\n')[6:] %}
+                <li>{{ hour }}</li>
+            {% endfor %}
+            </ul>
+        {% endif %}
+    {% endfor %}
+{% endif %}

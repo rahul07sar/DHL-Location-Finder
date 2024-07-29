@@ -1,0 +1,7 @@
+services:
+  dhl_location_finder.route_builder:
+    class: Drupal\dhl_location_finder\RouteBuilder
+    arguments: ['@service_container']
+  dhl_location_finder.province_repository:
+    class: Drupal\dhl_location_finder\ProvinceRepository
+    arguments: ['@database']

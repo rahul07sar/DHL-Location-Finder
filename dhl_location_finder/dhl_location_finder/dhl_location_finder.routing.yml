@@ -1,0 +1,14 @@
+dhl_location_finder.form:
+  path: '/dhl-location-finder'
+  defaults:
+    _form: '\Drupal\dhl_location_finder\Form\DHLLocationFinderForm'
+    _title: 'DHL Location Finder'
+  requirements:
+    _permission: 'access content'
+dhl_location_finder.locations:
+  path: '/dhl-location-finder/locations'
+  defaults:
+    _controller: '\Drupal\dhl_location_finder\Controller\LocationFinderController::locations'
+    _format: text
+  requirements:
+    _permission: 'access content'

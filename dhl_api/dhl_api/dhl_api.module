@@ -1,0 +1,106 @@
+<?php
+
+/**
+ * @file
+ * Exact online webshop API authorization hook overrides.
+ */
+
+use Drupal\knpi_exact_online_products_sync\Form\KnpiExactOnlineProductSync;
+
+/**
+ * Cron job to handle the synchronization of Selection codes.
+ */
+function knpi_exact_online_products_sync_cron() {
+  $config = \Drupal::configFactory()
+    ->getEditable(KnpiExactOnlineProductSync::EO_API_WAREHOUSE_SETTINGS);
+
+  // Early exit the hook if EO authentication is not enabled.
+  if (!$config->get('enable_eo_autorization')) {
+    return;
+  }
+
+  $minutes = (int)((new \DateTime())->format('i'));
+
+  if ($minutes === 0) {
+    $knpi_exact_online_webshop_token_service = \Drupal::service('knpi_exact_online_products_sync.eo_client');
+    $knpi_exact_online_webshop_token_service->productLookupByCode('', 'update_stock_bulk');
+  }
+}
+
+/**
+ * Implements hook_preprocess_HOOK().
+ *
+ * When viewing a full display product.
+ */
+function knpi_exact_online_products_sync_preprocess_commerce_product__full(&$variables) {
+  $product = $variables['elements']['#commerce_product'];
+  \Drupal::service("page_cache_kill_switch")->trigger();
+  // Stock sync.
+  $no_negative_stock_option = $product->get('field_negatieve_stock_niet_mogel')
+    ->getValue();
+  if (isset($no_negative_stock_option[0]['value']) && $no_negative_stock_option[0]['value']) {
+    $stock = $product->get('field_stock')->getValue();
+    $variables['always_order'] = FALSE;
+    $variables['product_stock'] = $stock;
+  }
+  else {
+    $variables['always_order'] = TRUE;
+  }
+  $variables['#cache'] = ['max-age' => 0];
+}
+
+/**
+ * Helper method to check if token expiry is exceeding 10m frame.
+ */
+function knpi_exact_online_products_sync_check_access_token_is_expired() {
+  if ($knpi_exact_online_webshop_token_service = \Drupal::service('knpi_exact_online_products_sync.eo_client')) {
+    $token = $knpi_exact_online_webshop_token_service->getHashedTokenInfo();
+    if (!empty($token['stored_at_timestamp'])) {
+      $current_time = \Drupal::time()->getCurrentTime();
+      return round(abs($current_time - $token['stored_at_timestamp']) / 60, 2);
+    }
+  }
+}
+
+/**
+ * Helper method to generate query paramteres for the EO authentication process.
+ */
+function knpi_exact_online_products_sync_generate_auth_query($type) {
+  $config = \Drupal::configFactory()
+    ->getEditable(KnpiExactOnlineProductSync::EO_API_WAREHOUSE_SETTINGS);
+
+  if ($knpi_exact_online_webshop_token_service = \Drupal::service('knpi_exact_online_products_sync.eo_client')) {
+    $token = $knpi_exact_online_webshop_token_service->getHashedTokenInfo();
+  }
+  switch ($type) {
+    case 'auth':
+      $params_auth = [
+        'client_id' => $config->get('eo_client_id'),
+        'redirect_uri' => $config->get('eo_redirect_url'),
+        'response_type' => 'code',
+        'force_login' => 1,
+      ];
+      $query = http_build_query($params_auth);
+      break;
+
+    case 'token':
+      $params_auth = [
+        'client_id' => $config->get('eo_client_id'),
+        'client_secret' => $config->get('eo_client_secret'),
+        'redirect_uri' => $config->get('eo_redirect_url'),
+        'grant_type' => 'authorization_code',
+      ];
+      $query = $params_auth;
+      break;
+
+    case 'refresh_token':
+      $params_auth = [
+        'client_id' => $config->get('eo_client_id'),
+        'client_secret' => $config->get('eo_client_secret'),
+        'grant_type' => 'refresh_token',
+      ];
+      $query = $params_auth;
+      break;
+  }
+  return $query;
+}

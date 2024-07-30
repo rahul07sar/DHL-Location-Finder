@@ -1,0 +1,6 @@
+knpi_exact_online_products_sync.menu.settings_form:
+  title: DHL Api Settings
+  parent: system.admin_config_services
+  route_name: dhl_api.settings_form
+  weight: 0
+  description: Settings to DHL API.

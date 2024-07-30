@@ -1,0 +1,5 @@
+name: DHL API Syncroniser.
+type: module
+description: "This module handles the Location requests to DHL API."
+core_version_requirement: ^9 || ^10
+package: DHL
